@@ -1,26 +1,27 @@
-﻿# 💾 Zero-Copy Shared Memory Logger
+﻿# 🕸️ HFT Network Sniffer (Raw Sockets)
 
-![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=flat&logo=c%2B%2B&logoColor=white) ![IPC](https://img.shields.io/badge/IPC-Shared%20Memory-green) ![Lock-Free](https://img.shields.io/badge/Concurrency-Lock--Free-orange)
+![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54) ![Network](https://img.shields.io/badge/Network-TCP%2FIP-blue) ![Low Level](https://img.shields.io/badge/Low-Level-red)
 
-Une implémentation de système de logging ultra-faible latence utilisant la **Mémoire Partagée (POSIX SHM)** pour découpler le chemin critique du trading des opérations d'I/O lentes.
+Un analyseur de trafic réseau passif conçu pour monitorer la latence et les micro-bursts en contournant les abstractions de haut niveau.
 
-## 🎯 Le Problème Résolu
-Dans les systèmes critiques, écrire sur le disque (std::cout ou printf) est une opération bloquante et lente.
-**Solution :** Le Trader écrit dans un buffer circulaire en RAM. Un processus Logger séparé vide ce buffer et écrit sur le disque.
+## 📡 Fonctionnalités
 
-## ⚙️ Architecture Technique
+* **Raw Sockets (AF_PACKET) :** Interception directe des trames Ethernet au niveau de la carte réseau (NIC).
+* **Binary Parsing :** Décodage manuel des en-têtes Ethernet, IP et TCP (via \struct.unpack\).
+* **Micro-burst Detection :** Identification en temps réel des pics de trafic anormaux pouvant saturer la bande passante HFT.
 
-1.  **IPC (Inter-Process Communication) :** Utilisation de \mmap\ et \shm_open\ pour partager une zone de RAM entre deux processus distincts.
-2.  **Lock-Free Ring Buffer :** Utilisation de \std::atomic\ pour gérer les pointeurs \head\ et \	ail\ sans utiliser de Mutex (verrous), éliminant les changements de contexte coûteux.
-3.  **Busy Spinning vs Yielding :** Stratégies d'attente optimisées pour réduire la latence CPU.
+## 🛠 Stack Technique
 
-## 🚀 Démo
+* **Langage :** Python (Optimisé sans librairies externes lourdes).
+* **OS Access :** Privileged Docker Container pour l'accès direct aux interfaces réseau.
+* **Protocole :** Analyse approfondie des flags TCP (SYN, ACK, PSH) pour mesurer la santé des connexions.
+
+## 🚀 Utilisation
 
 \\\ash
-# Lancer le Producteur et le Consommateur
-docker build -t shm-logger .
-docker run --rm --ipc=host shm-logger
+# Nécessite les droits privilégiés pour ouvrir un Raw Socket
+docker-compose up --build
 \\\
 
-## 🧬 Structure de Données
-Le buffer utilise une structure alignée en mémoire pour éviter le *false sharing* et maximiser l'efficacité du cache CPU.
+## 🎯 Objectif
+Démontrer la compréhension de la pile TCP/IP et la capacité à construire des outils de diagnostic réseau sur mesure pour des environnements à contraintes fortes.
